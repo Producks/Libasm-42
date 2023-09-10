@@ -1,1 +1,3 @@
-.
+Cheat sheet: https://ggbaker.ca/295/x86.html
+List of system call: https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+NASM tutorial/resources: https://cs.lmu.edu/~ray/notes/nasmtutorial/

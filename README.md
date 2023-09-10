@@ -1,2 +1,2 @@
 # Libasm-42
-x86-64 assembly school project from 42 school
+x86-64 assembly project for 42 school part of the specialization
