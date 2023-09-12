@@ -1,7 +1,6 @@
 global _ft_strcmp
 
 section		.text
-;int strcmp(const char *s1, const char *s2);
 _ft_strcmp:
 						cmp	rdi, 0	; Check for NULL ptr
 						je	done

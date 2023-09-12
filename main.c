@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <fcntl.h> // For open
+#include <unistd.h> // For close
+#include <stdlib.h> // For malloc
 #include <string.h>
 
 //Prototypes for assembly functions from libasm.a
@@ -6,12 +9,16 @@ size_t 	_ft_strlen(const char *s);
 char 		*_ft_strcpy(char *dest, const char *src);
 int			_ft_strcmp(const char *s1, const char *s2);
 size_t 	_ft_write(int fd, const void *buf, size_t count);
+size_t	_ft_read(int fd, void *buf, size_t count);
+char 		*_ft_strdup(const char *s);
 
 //Prototypes for test functions
 void	test_strlen(void);
 void	test_strcpy(void);
 void	test_strcpm(void);
 void	test_write(void);
+void	test_read(void);
+void	test_strdup(void);
 
 void	print_color_meaning(void);
 
@@ -45,6 +52,12 @@ int main(int argc, char **argv)
 		case '3':
 			test_write();
 			break;
+		case '4':
+			test_read();
+			break;
+		case '5':
+			test_strdup();
+			break;
 		case 'c':
 			print_color_meaning();
 			break;
@@ -76,7 +89,7 @@ void	test_strcpy(void)
 
 	result = _ft_strcpy(NULL, "Sending a NULL ptr!😈\n");
 	if (result == NULL)
-		printf("Result from " MAG "ft_strcpy " RESET "with a " RED "NULL ptr " RESET "sent to it = " GRN "NULL" RESET "\n");
+		printf("Result from " MAG "ft_strcpy " RESET "with a " RED "NULL ptr " RESET "sent to it = " GRN "%s" RESET "\n", result);
 	else
 		puts("This should never print since NULL was sent!");
 }
@@ -114,6 +127,58 @@ void	test_write(void)
 	result = _ft_write(1, NULL, 4);
 	perror("Libasm:");
 	printf("The return after passing a " RED "NULL ptr" RESET " = " GRN "%d" RESET "\n", result);
+}
+
+#define BUFFER_SIZE 10
+
+void	test_read(void)
+{
+	char 	buffer[BUFFER_SIZE];
+	int		result = 0;
+	int		fd = open("Makefile", O_RDONLY);
+
+	if (fd == -1){
+		puts("Bozo stop messing with my file");
+		return;
+	}
+
+	result = _ft_read(fd, buffer, BUFFER_SIZE - 1);
+	buffer[result] = '\0';
+	printf("Result from " MAG "ft_read " RESET "when " PNK "Makefile " RESET "is being read at BUFFER_SIZE = " GRN "%d" RESET "\n", result);
+	printf("Printing buffer:\n%s\n-----\n", buffer);
+
+	close(fd);
+	result = _ft_read(fd, buffer, BUFFER_SIZE - 1);
+	buffer[result] = '\0';
+	printf("Result from " MAG "ft_read " RESET "when " RED "closed fd " RESET "is being read at BUFFER_SIZE = " GRN "%d" RESET "\n", result);
+	printf("Printing buffer:\n%s\n", buffer);
+	perror("Libasm");
+	printf("-----\n");
+
+	// DANGEROUS TEST, can't check bound checking so will uncoment during correction
+	// printf("Please enter your favorite meal here:");
+	// fflush(stdout);
+	// result = _ft_read(0, buffer, BUFFER_SIZE - 1);
+	// buffer[result] = '\0';
+	// printf("Result from " MAG "ft_read " RESET "when " PNK "STDIN " RESET "is being read at BUFFER_SIZE = " GRN "%d" RESET "\n", result);
+	// printf("Printing buffer:\n%s\n-----\n", buffer);
+}
+
+void	test_strdup(void)
+{
+	char *result = _ft_strdup("Hi!");
+	printf("Result from " MAG "ft_strdup " RESET "when " PNK "Hi! " RESET "is being passed = " GRN "%s" RESET "\n", result);
+	free(result);
+
+	result = _ft_strdup("");
+	printf("Result from " MAG "ft_strdup " RESET "when " PNK "\"\" " RESET "is being passed = " GRN "%s" RESET "\n", result);
+	free(result);
+
+	result = _ft_strdup(NULL);
+	if (!result)
+		printf("Result from " MAG "ft_strdup " RESET "when " RED "NULL ptr " RESET "is being passed = " GRN "%s" RESET "\n", result);
+	else
+		puts("Shouldn't cone here!");
 }
 
 void	print_color_meaning(void)
