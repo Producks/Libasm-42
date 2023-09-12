@@ -10,4 +10,4 @@ increment:
 		inc	rax					; Increment counter by 1
 		jmp	increment			; Increment the index
 done:
-		ret						; Return
+		ret

@@ -1,17 +1,17 @@
-				global _ft_write
+global _ft_write
+extern	__errno_location
 
-				section 	.text
-				extern 		__errno_location
+		section	.text
 _ft_write:
-				mov				rax, 1			; syscall for write
-				syscall
-				cmp				rax, 0			; Check for return value
-				jl				error				; Jump if it's negative
-				ret										; return if no error
+		mov		rax, 1			; System call for write
+		syscall
+		cmp		rax, 0			; Check for return value
+		jl		error			; Jump if it's negative
+		ret
 error:
-				neg				rax					; make rax positive
-				mov				rdi, rax		; save rax value
-				call			__errno_location wrt ..plt ; ..plt to fix gcc compliation issue on linux, what garbage is this?
-				mov				[rax], rdi	; set errno
-				mov				rax, -1			; set back return value to -1 for write
-				ret										; return
+		neg		rax				; Make rax positive
+		mov		rdi, rax		; Save rax value
+		call 	__errno_location wrt ..plt
+		mov		[rax], rdi		; Set errno
+		mov		rax, -1			; Set back return value to -1 for write
+		ret
