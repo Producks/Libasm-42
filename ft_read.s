@@ -1,17 +1,17 @@
 global _ft_read
+extern __errno_location
 
-				section		.text
-				extern		__errno_location
+		section	.text
 _ft_read:
-					mov	rax, 0
-					syscall
-					cmp rax, 0
-					jl 	error
-					ret
+		mov	rax, 0	; Systemcall for read
+		syscall
+		cmp rax, 0
+		jl 	error
+		ret
 error:
-					neg		rax
-					mov		rdi, rax
-					call	__errno_location wrt ..plt
-					mov		[rax], rdi
-					mov		rax, -1
-					ret
+		neg	rax
+		mov	rdi, rax
+		call __errno_location wrt ..plt
+		mov	[rax], rdi
+		mov	rax, -1
+		ret

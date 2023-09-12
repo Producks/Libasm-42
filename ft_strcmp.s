@@ -7,11 +7,11 @@ _ft_strcmp:
 		cmp	rsi, 0	; Check for NULL ptr
 		je	done
 routine:
-		mov al, BYTE [rdi]
+		mov	al, BYTE [rdi]
 		mov	dl, BYTE [rsi]
-		cmp al, dl
+		cmp	al, dl
 		jne	not_equal
-		cmp al, 0
+		cmp	al, 0
 		je	done
 		inc rdi		; Incrementing pointer directly
 		inc rsi
