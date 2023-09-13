@@ -1,8 +1,8 @@
-global _ft_write
+global ft_write
 extern	__errno_location
 
 		section	.text
-_ft_write:
+ft_write:
 		mov	rax, 1			; System call for write
 		syscall
 		cmp	rax, 0			; Check for return value

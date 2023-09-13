@@ -5,12 +5,21 @@
 #include <string.h>
 
 //Prototypes for assembly functions from libasm.a
-size_t 	_ft_strlen(const char *s);
-char 		*_ft_strcpy(char *dest, const char *src);
-int			_ft_strcmp(const char *s1, const char *s2);
-size_t 	_ft_write(int fd, const void *buf, size_t count);
-size_t	_ft_read(int fd, void *buf, size_t count);
-char 		*_ft_strdup(const char *s);
+size_t 	ft_strlen(const char *s);
+char 		*ft_strcpy(char *dest, const char *src);
+int			ft_strcmp(const char *s1, const char *s2);
+size_t 	ft_write(int fd, const void *buf, size_t count);
+size_t	ft_read(int fd, void *buf, size_t count);
+char 		*ft_strdup(const char *s);
+
+typedef struct s_list
+{
+	void	*data;
+	struct s_list	*next;
+} t_list;
+
+//Bonus prototypes
+void		ft_list_push_front(t_list **begin_list, void *data);
 
 //Prototypes for test functions
 void	test_strlen(void);
@@ -19,6 +28,15 @@ void	test_strcpm(void);
 void	test_write(void);
 void	test_read(void);
 void	test_strdup(void);
+
+//Bonus test functions
+void	test_ft_list_push_front(void);
+
+//Bonus utils
+t_list *generate_linked_list(void);
+void		print_list(t_list *begin);
+void		free_list(t_list **begin);
+t_list	*generate_node(int number);
 
 void	print_color_meaning(void);
 
@@ -58,6 +76,9 @@ int main(int argc, char **argv)
 		case '5':
 			test_strdup();
 			break;
+		case '7':
+			test_ft_list_push_front();
+			break;
 		case 'c':
 			print_color_meaning();
 			break;
@@ -70,9 +91,9 @@ int main(int argc, char **argv)
 
 void	test_strlen(void)
 {
-	printf("Result from " MAG "ft_strlen " RESET "when passing " PNK "Hello, world!" RESET " = " GRN "%ld\n" RESET, _ft_strlen("Hello, world!"));
-	printf("Result from " MAG "ft_strlen " RESET "when passing " PNK "\"\"" RESET " = " GRN "%ld\n" RESET, _ft_strlen(""));
-	printf("Result from " MAG "ft_strlen " RESET "when passing a " RED "NULL ptr" RESET " = " GRN "%ld\n" RESET, _ft_strlen(NULL));
+	printf("Result from " MAG "ft_strlen " RESET "when passing " PNK "Hello, world!" RESET " = " GRN "%ld\n" RESET, ft_strlen("Hello, world!"));
+	printf("Result from " MAG "ft_strlen " RESET "when passing " PNK "\"\"" RESET " = " GRN "%ld\n" RESET, ft_strlen(""));
+	printf("Result from " MAG "ft_strlen " RESET "when passing a " RED "NULL ptr" RESET " = " GRN "%ld\n" RESET, ft_strlen(NULL));
 }
 
 void	test_strcpy(void)
@@ -81,13 +102,13 @@ void	test_strcpy(void)
 	char	src[] = "Hello, world!";
 	char *result;
 
-	result = _ft_strcpy(destination, src);
+	result = ft_strcpy(destination, src);
 	printf("Result from " MAG "ft_strcpy " RESET "copying "PNK "Hello, World!" RESET " to " PNK "destination" RESET " = " GRN "%s\n" RESET, destination);
 
-	result = _ft_strcpy(destination, "Hi");
+	result = ft_strcpy(destination, "Hi");
 	printf("Result from " MAG "ft_strcpy " RESET "coying over " PNK "destination " RESET "with " PNK "Hi" RESET " = " GRN "%s\n" RESET, result);
 
-	result = _ft_strcpy(NULL, "Sending a NULL ptr!😈\n");
+	result = ft_strcpy(NULL, "Sending a NULL ptr!😈\n");
 	if (result == NULL)
 		printf("Result from " MAG "ft_strcpy " RESET "with a " RED "NULL ptr " RESET "sent to it = " GRN "%s" RESET "\n", result);
 	else
@@ -98,16 +119,16 @@ void	test_strcpm(void)
 {
 	int result = 0 ;
 
-	result = _ft_strcmp("Bozo", "Bozo");
+	result = ft_strcmp("Bozo", "Bozo");
 	printf("Result from " MAG "ft_strcmp " RESET "comparing " PNK "Bozo " RESET "and " PNK "Bozo" RESET " = " GRN "%d" RESET "\n", result);
 
-	result = _ft_strcmp("Bozo69", "Bozo");
+	result = ft_strcmp("Bozo69", "Bozo");
 	printf("Result from " MAG "ft_strcmp " RESET "comparing " PNK "Bozo69 " RESET "and " PNK "Bozo" RESET " = " GRN "%d" RESET "\n", result);
 
-	result = _ft_strcmp("Bozo", "Bozo69");
+	result = ft_strcmp("Bozo", "Bozo69");
 	printf("Result from " MAG "ft_strcmp " RESET "comparing " PNK "Bozo " RESET "and " PNK "Bozo69" RESET " = " GRN "%d" RESET "\n", result);
 
-	result = _ft_strcmp(NULL, "Sending a NULL ptr!😈\n");
+	result = ft_strcmp(NULL, "Sending a NULL ptr!😈\n");
 	printf("Result from " MAG "ft_strcmp " RESET "being sent a " RED "NULL ptr" RESET " = " GRN "%d" RESET "\n", result);
 }
 
@@ -115,16 +136,16 @@ void	test_write(void)
 {
 	int result = 0;
 
-	_ft_write(1, "Using ft_write to write this on the STDIN!\n-----\n", 49);
+	ft_write(1, "Using ft_write to write this on the STDIN!\n-----\n", 49);
 
 	printf("Passing " RED "invalid fd" RESET " to " MAG "ft_write" RESET "\n");
-	result = _ft_write(69, "BOZO", 40000);
+	result = ft_write(69, "BOZO", 40000);
 	printf("The return after passing an " RED "invalid fd" RESET " = " GRN "%d" RESET "\n", result);
 	perror("Libasm");
-	_ft_write(1, "----\n", 6);
+	ft_write(1, "----\n", 6);
 
 	printf("Passing " RED "NULL ptr" RESET " to " MAG "ft_write" RESET "\n");
-	result = _ft_write(1, NULL, 4);
+	result = ft_write(1, NULL, 4);
 	perror("Libasm:");
 	printf("The return after passing a " RED "NULL ptr" RESET " = " GRN "%d" RESET "\n", result);
 }
@@ -142,13 +163,13 @@ void	test_read(void)
 		return;
 	}
 
-	result = _ft_read(fd, buffer, BUFFER_SIZE - 1);
+	result = ft_read(fd, buffer, BUFFER_SIZE - 1);
 	buffer[result] = '\0';
 	printf("Result from " MAG "ft_read " RESET "when " PNK "Makefile " RESET "is being read at BUFFER_SIZE = " GRN "%d" RESET "\n", result);
 	printf("Printing buffer:\n%s\n-----\n", buffer);
 
 	close(fd);
-	result = _ft_read(fd, buffer, BUFFER_SIZE - 1);
+	result = ft_read(fd, buffer, BUFFER_SIZE - 1);
 	buffer[result] = '\0';
 	printf("Result from " MAG "ft_read " RESET "when " RED "closed fd " RESET "is being read at BUFFER_SIZE = " GRN "%d" RESET "\n", result);
 	printf("Printing buffer:\n%s\n", buffer);
@@ -158,7 +179,7 @@ void	test_read(void)
 	// DANGEROUS TEST, can't check bound checking so will uncoment during correction
 	// printf("Please enter your favorite meal here:");
 	// fflush(stdout);
-	// result = _ft_read(0, buffer, BUFFER_SIZE - 1);
+	// result = ft_read(0, buffer, BUFFER_SIZE - 1);
 	// buffer[result] = '\0';
 	// printf("Result from " MAG "ft_read " RESET "when " PNK "STDIN " RESET "is being read at BUFFER_SIZE = " GRN "%d" RESET "\n", result);
 	// printf("Printing buffer:\n%s\n-----\n", buffer);
@@ -166,15 +187,17 @@ void	test_read(void)
 
 void	test_strdup(void)
 {
-	char *result = _ft_strdup("Hi!");
+	char *result = ft_strdup("Hi!");
+	if (!result)
+		return;
 	printf("Result from " MAG "ft_strdup " RESET "when " PNK "Hi! " RESET "is being passed = " GRN "%s" RESET "\n", result);
 	free(result);
 
-	result = _ft_strdup("");
+	result = ft_strdup("");
 	printf("Result from " MAG "ft_strdup " RESET "when " PNK "\"\" " RESET "is being passed = " GRN "%s" RESET "\n", result);
 	free(result);
 
-	result = _ft_strdup(NULL);
+	result = ft_strdup(NULL);
 	if (!result)
 		printf("Result from " MAG "ft_strdup " RESET "when " RED "NULL ptr " RESET "is being passed = " GRN "%s" RESET "\n", result);
 	else
@@ -187,4 +210,120 @@ void	print_color_meaning(void)
 	printf(PNK "██ Is the argument being passed to the function" RESET "\n");
 	printf(RED "██ Is an invalid or erroneous argument being passed to the function" RESET "\n");
 	printf(GRN "██ Is the result from the function" RESET "\n");
+}
+
+/*
+	BONUS
+*/
+
+void	test_ft_list_push_front(void)
+{
+	t_list *begining = generate_linked_list();
+
+	if (!begining){
+		puts("FATAL ERROR");
+		return;
+	}
+	printf("Content of the linked list before any modification:\n");
+	print_list(begining);
+	puts("----");
+
+	printf("Result after " MAG "ft_list_push_front " RESET "is called with the number " PNK "69" RESET ":\n");
+	int	*number = malloc(sizeof(int*));
+	if (!number){
+		puts("FATAL ERROR");
+		free_list(&begining);
+		return;
+	}
+	*number = 69;
+	ft_list_push_front(&begining, (void*)number);
+	print_list(begining);
+	puts("----");
+
+	int *number_two = malloc(sizeof(int*));
+	if (!number){
+		puts("FATAL ERROR");
+		free_list(&begining);
+		return;
+	}
+	*number_two = 42;
+	printf("Result after " MAG "ft_list_push_front " RESET "is called with the number " PNK "42" RESET ":\n");
+	ft_list_push_front(&begining, (void*)number_two);
+	print_list(begining);
+	puts("----");
+
+	free_list(&begining);
+	begining = NULL;
+	number = malloc(sizeof(int*));
+	if (!number){
+		puts("FATAL ERROR");
+		return;
+	}
+	*number = 69;
+	printf("Result after " MAG "ft_list_push_front " RESET "is called with the number " PNK "69" RESET " and the head being" RED " NULL" RESET ":\n");
+	ft_list_push_front(&begining, number);
+	print_list(begining);
+	free_list(&begining);
+}
+
+t_list	*generate_linked_list(void)
+{
+	t_list *begin = generate_node(0);
+	if (!begin)
+		return NULL;
+
+	t_list *node = generate_node(1);
+	if (!node){
+		free(begin->data), free(begin);
+		return NULL;
+	}
+	begin->next = node;
+
+	t_list *node_second = generate_node(2);
+	if (!node_second){
+		free_list(&begin);
+		return NULL;
+	}
+	node->next = node_second;
+	return begin;
+}
+
+void		print_list(t_list *begin)
+{
+	t_list *current;
+	current = begin;
+	while (current != NULL)
+	{
+		if (current->data != NULL)
+		{
+			printf("%d\n", *(int*)(current->data));
+		}
+		current = current->next;
+	}
+}
+
+void	free_list(t_list **begin)
+{
+	t_list *current = *begin;
+	t_list *tmp = NULL;
+
+	while (current != NULL)
+	{
+		if (current->data != NULL)
+			free(current->data);
+		tmp = current->next;
+		free(current);
+		current = tmp;
+	}
+}
+
+t_list	*generate_node(int number)
+{
+	t_list *node = malloc(sizeof(t_list));
+	int *data = malloc(sizeof(int));
+
+	*data = number;
+	node->data = data;
+	node->next = NULL;
+	return node;
 }

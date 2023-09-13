@@ -1,6 +1,6 @@
-global _ft_strlen
+global ft_strlen
 		section .text
-_ft_strlen:
+ft_strlen:
 		xor	rax, rax			; Set counter to 0
 		cmp	rdi, 0				; Check for null pointer?
 		je	done				; Go directly to done if NULL ptr

@@ -1,7 +1,7 @@
-global _ft_strcmp
+global ft_strcmp
 
 		section	.text
-_ft_strcmp:
+ft_strcmp:
 		cmp	rdi, 0	; Check for NULL ptr
 		je	done
 		cmp	rsi, 0	; Check for NULL ptr
@@ -16,7 +16,7 @@ routine:
 		inc rdi		; Incrementing pointer directly
 		inc rsi
 		jmp routine
-not_equal:
+not_equal:			; Linux implementation done, mac one is different
 		cmp al, dl
 		jb	negative
 positive:

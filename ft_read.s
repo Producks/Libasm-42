@@ -1,8 +1,8 @@
-global _ft_read
+global ft_read
 extern __errno_location
 
 		section	.text
-_ft_read:
+ft_read:
 		mov	rax, 0	; Systemcall for read
 		syscall
 		cmp rax, 0
