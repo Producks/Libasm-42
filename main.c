@@ -20,6 +20,7 @@ typedef struct s_list
 
 //Bonus prototypes
 void		ft_list_push_front(t_list **begin_list, void *data);
+int			ft_list_size(t_list *begin_list);
 
 //Prototypes for test functions
 void	test_strlen(void);
@@ -31,6 +32,7 @@ void	test_strdup(void);
 
 //Bonus test functions
 void	test_ft_list_push_front(void);
+void	test_ft_list_size(void);
 
 //Bonus utils
 t_list *generate_linked_list(void);
@@ -39,6 +41,7 @@ void		free_list(t_list **begin);
 t_list	*generate_node(int number);
 
 void	print_color_meaning(void);
+void	print_settings(void);
 
 //Colors
 #define RED   "\x1B[31m"
@@ -54,7 +57,7 @@ void	print_color_meaning(void);
 int main(int argc, char **argv)
 {
 	if (argc != 2){
-		puts("Wrong number of arguments\n");
+		print_settings();
 		return 1;
 	}
 	switch(argv[1][0]){
@@ -78,6 +81,9 @@ int main(int argc, char **argv)
 			break;
 		case '7':
 			test_ft_list_push_front();
+			break;
+		case '8':
+			test_ft_list_size();
 			break;
 		case 'c':
 			print_color_meaning();
@@ -204,6 +210,21 @@ void	test_strdup(void)
 		puts("Shouldn't cone here!");
 }
 
+void	print_settings(void)
+{
+	printf("To access the correct test function, pass the correct parameter\n"
+	"[c] Print color meaning\n"
+	"[0] ft_strlen\n"
+	"[1] ft_strcpy\n"
+	"[2] ft_strcmp\n"
+	"[3] ft_write\n"
+	"[4] ft_read\n"
+	"[5] ft_strdup\n"
+	"[6] atoi_base\n"
+	"[7] ft_list_push_Front\n"
+	);
+}
+
 void	print_color_meaning(void)
 {
 	printf(MAG "██ Is the asm version of the function being called" RESET "\n");
@@ -263,6 +284,33 @@ void	test_ft_list_push_front(void)
 	printf("Result after " MAG "ft_list_push_front " RESET "is called with the number " PNK "69" RESET " and the head being" RED " NULL" RESET ":\n");
 	ft_list_push_front(&begining, number);
 	print_list(begining);
+	free_list(&begining);
+}
+
+void	test_ft_list_size(void)
+{
+	t_list *begining = generate_linked_list();
+	if (!begining){
+		puts("FATAL ERROR");
+		return;
+	}
+
+	int result = ft_list_size(begining);
+	printf("Result after " MAG "ft_list_size " RESET "is called with a list size of " PNK "3" RESET " = " GRN "%d" RESET "\n", result);
+
+	int *number = malloc(sizeof(int));
+	if (!number){
+		puts("Fatal ERROR");
+		free_list(&begining);
+		return;
+	}
+	*number = 69;
+	ft_list_push_front(&begining, number);
+	result = ft_list_size(begining);
+	printf("Result after " MAG "ft_list_size " RESET "is called with a list size of " PNK "4" RESET " = " GRN "%d" RESET "\n", result);
+
+	result = ft_list_size(NULL);
+	printf("Result after " MAG "ft_list_size " RESET "is called with " RED "NULL" RESET " = " GRN "%d" RESET "\n", result);
 	free_list(&begining);
 }
 
