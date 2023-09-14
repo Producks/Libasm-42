@@ -8,7 +8,7 @@ ft_list_size:
 routine:
 		mov		rdi, [rdi + 8]
 		inc		rax
-		test	rdi, rdi			; Check *void for content
+		test	rdi, rdi			; Check *next for content
 		jnz		routine
 done:
 		ret

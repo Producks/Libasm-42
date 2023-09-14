@@ -21,6 +21,7 @@ typedef struct s_list
 //Bonus prototypes
 void		ft_list_push_front(t_list **begin_list, void *data);
 int			ft_list_size(t_list *begin_list);
+void		ft_list_sort(t_list **begin_list, int (*cmp)());
 
 //Prototypes for test functions
 void	test_strlen(void);
@@ -33,12 +34,15 @@ void	test_strdup(void);
 //Bonus test functions
 void	test_ft_list_push_front(void);
 void	test_ft_list_size(void);
+void	test_ft_list_sort(void);
 
 //Bonus utils
 t_list *generate_linked_list(void);
 void		print_list(t_list *begin);
 void		free_list(t_list **begin);
 t_list	*generate_node(int number);
+t_list	*generate_shuffled_list(void);
+int			compare(void *data, void *data_two);
 
 void	print_color_meaning(void);
 void	print_settings(void);
@@ -84,6 +88,9 @@ int main(int argc, char **argv)
 			break;
 		case '8':
 			test_ft_list_size();
+			break;
+		case '9':
+			test_ft_list_sort();
 			break;
 		case 'c':
 			print_color_meaning();
@@ -314,6 +321,89 @@ void	test_ft_list_size(void)
 	free_list(&begining);
 }
 
+int	compare(void *data, void *data_two)
+{
+	if (!data || !data_two)
+		return 0;
+	if (*(int*)data == *(int*)data_two)
+		return 0;
+	if (*(int*)data < *(int*)data_two)
+		return -1;
+	else
+		return 1;
+}
+
+t_list 	*ft_bozo(t_list **begin, int(*cmp)())
+{
+	t_list *current = *begin;
+	int		flag = 1;
+	
+	while (flag != 0)
+	{
+		flag = 0;
+		current = *begin;
+		while (current->next != NULL)
+		{
+			int result = cmp(current->data, current->next->data);
+			if (result == 1){
+				flag = 1;
+				void *tmp = current->data;
+				current->data = current->next->data;
+				current->next->data = tmp;
+				break;
+			}
+			current = current->next;
+		}
+	}
+}
+
+void	test_ft_list_sort(void)
+{
+	t_list	*shuffled_list = generate_shuffled_list();
+	if (!shuffled_list){
+		puts("FATAL ERROR");
+		return;
+	}
+	puts("Shuffled list before sorting:");
+	print_list(shuffled_list);
+	puts("-----");
+
+	printf("Result after " MAG "ft_list_sort" RESET " is called on the" PNK " shuffled_list" RESET ":\n");
+	ft_list_sort(&shuffled_list, compare);
+	print_list(shuffled_list);
+	free_list(&shuffled_list);
+	puts("-----");
+
+	t_list *node = generate_node(50);
+	if (!node){
+		puts("Fatal error");
+		return;
+	}
+	printf("Result after " MAG "ft_list_sort" RESET " is called on " PNK "1 node" RESET ":\n");
+	ft_list_sort(&node, compare);
+	print_list(node);
+	free_list(&node);
+	puts("-----");
+
+	t_list *sorted_list = generate_linked_list();
+	if (!sorted_list){
+		puts("Fatal error");
+		return;
+	}
+	printf("Result after " MAG "ft_list_sort" RESET " is called on a " PNK "sorted list" RESET ":\n");
+	ft_list_sort(&sorted_list, compare);
+	print_list(sorted_list);
+	puts("-----");
+	
+	printf("Result after " MAG "ft_list_sort" RESET " is called with a " RED "NULL ptr" RESET ":\n");
+	ft_list_sort(&sorted_list, NULL);
+	print_list(sorted_list);
+	free_list(&sorted_list);
+
+	ft_list_sort(NULL, NULL);
+}
+
+
 t_list	*generate_linked_list(void)
 {
 	t_list *begin = generate_node(0);
@@ -368,10 +458,44 @@ void	free_list(t_list **begin)
 t_list	*generate_node(int number)
 {
 	t_list *node = malloc(sizeof(t_list));
+	if (!node)
+		return NULL;
 	int *data = malloc(sizeof(int));
+	if (!data){
+		free(node);
+		return NULL;
+	}
 
 	*data = number;
 	node->data = data;
 	node->next = NULL;
 	return node;
+}
+
+t_list	*generate_shuffled_list(void)
+{
+	t_list *node_one = generate_node(0);
+	t_list *node_two = generate_node(6969);
+	t_list *node_three = generate_node(-69);
+	t_list *node_four = generate_node(69);
+	t_list *node_five = generate_node(-6969);
+	if (!node_one || !node_two || !node_three || !node_four || !node_five){
+		if (node_one)
+			free(node_one);
+		if (node_two)
+			free(node_two);
+		if (node_three)
+			free(node_three);
+		if (node_four)
+			free(node_four);
+		if (node_five)
+			free(node_five);
+		return NULL;
+	}
+
+	node_one->next = node_two;
+	node_two->next = node_three;
+	node_three->next = node_four;
+	node_four->next = node_five;
+	return node_one;
 }
