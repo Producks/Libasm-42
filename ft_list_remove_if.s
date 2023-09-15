@@ -1,38 +1,13 @@
-							global _start
-
-							section 	.text
-	_start:     xor			rcx, rcx
-	hello:
-							mov			rax, 1
-							mov			rdi, 1
-							mov			rdx, 13
-							mov			rsi, md
-							push		rcx ; fix garbage
-							syscall
-							pop			rcx ; ???
-							inc			rcx
-							cmp			rcx, 10
-							jne			hello
-	exit:		
-							mov       	rax, 60
-							xor			rdi, rdi
-							syscall
-							section		.data
-	message:		db			"Hello, World", 10
-	md:					db			"retard", 10
-
-
 global ft_list_remove_if
 extern free
+extern print_list
 
 		section	.text
-;void	ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *));
 ; rdi taken arg1
 ; rsi taken arg2
 ; rax return value for cmp none in free
 ; rdx = hold cmp func pointer arg3 push to preserve
 ; rcx = hold free func pointer arg4 push to preserve
-;
 ; r8 will hold t_list *prev
 ; r9 will hold t_list *current
 ; r10 to hold return adress
@@ -63,19 +38,16 @@ compare:
 previous_null:
 		mov		r11, [r9 + 8]		; current->next in r11
 		mov		[rdi], r11			; *begin_list = current->next
-		call	save_registers
-		mov		rdi, qword [r9]		; Pass argument
-		call	rcx					; Call free function to delete current->data	
-		call	restore_registers
-		call	save_registers
-		mov		rdi, r9				; Pass *current to free 
-		call	free wrt ..plt
-		call	restore_registers
+		call	free_element
 		mov		r9, [rdi]			; current = *begin_list
 		jmp		routine
 previous_not_null:
 		mov		r11, [r9 + 8]		; current->next in r11
 		mov		[r8 + 8], r11		; prev->next = current->next
+		call	free_element
+		mov		r9, [r8 + 8]
+		jmp		routine
+free_element:
 		call	save_registers
 		mov		rdi, qword [r9]
 		call	rcx
@@ -84,8 +56,7 @@ previous_not_null:
 		mov		rdi, r9
 		call	free wrt ..plt
 		call	restore_registers
-		mov		r9, [r8 + 8]
-		jmp		routine
+		ret
 move_node:
 		mov		r8, r9				; prev = current
 		mov		r9, [r9 + 8]		; DOUBLE CHECK IF THERE A BUG! SHOULD WORK? current = current->next
@@ -98,12 +69,10 @@ save_registers:
 		push	rcx
 		push	r8
 		push	r9
-		push	rbx				; Stack alignment
 		push	r10				; GARBAGE FIX
 		ret
 restore_registers:
 		pop		r10
-		pop		rbx				; Stack alignment
 		pop		r9
 		pop		r8
 		pop		rcx

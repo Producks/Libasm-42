@@ -30,7 +30,7 @@ routine:
 		call	r13					; Call the func *
 		pop		rcx					; Restore *current
 		pop		rdx					; Restore *current->next
-cc:
+compare:
 		cmp		rax, 1
 		je		swap				; Jump if rax = 1
 		mov		rcx, rdx			; SEND HELP

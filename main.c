@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <fcntl.h> // For open
 #include <unistd.h> // For close
-#include <stdlib.h> // For malloc
-#include <string.h>
+#include <stdlib.h> // For malloc and free
 
 //Prototypes for assembly functions from libasm.a
 size_t 	ft_strlen(const char *s);
@@ -22,6 +21,9 @@ typedef struct s_list
 void		ft_list_push_front(t_list **begin_list, void *data);
 int			ft_list_size(t_list *begin_list);
 void		ft_list_sort(t_list **begin_list, int (*cmp)());
+t_list	*ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *));
+// (*cmp)(list_ptr->data, data_ref);
+// (*free_fct)(list_ptr->data);
 
 //Prototypes for test functions
 void	test_strlen(void);
@@ -35,6 +37,7 @@ void	test_strdup(void);
 void	test_ft_list_push_front(void);
 void	test_ft_list_size(void);
 void	test_ft_list_sort(void);
+void	test_ft_list_remove_if(void);
 
 //Bonus utils
 t_list *generate_linked_list(void);
@@ -43,6 +46,8 @@ void		free_list(t_list **begin);
 t_list	*generate_node(int number);
 t_list	*generate_shuffled_list(void);
 int			compare(void *data, void *data_two);
+int			compare_remove_if(void *data, void *data_ref);
+void		free_content(void *data);
 
 void	print_color_meaning(void);
 void	print_settings(void);
@@ -91,6 +96,9 @@ int main(int argc, char **argv)
 			break;
 		case '9':
 			test_ft_list_sort();
+			break;
+		case 'a':
+			test_ft_list_remove_if();
 			break;
 		case 'c':
 			print_color_meaning();
@@ -333,30 +341,6 @@ int	compare(void *data, void *data_two)
 		return 1;
 }
 
-t_list 	*ft_bozo(t_list **begin, int(*cmp)())
-{
-	t_list *current = *begin;
-	int		flag = 1;
-	
-	while (flag != 0)
-	{
-		flag = 0;
-		current = *begin;
-		while (current->next != NULL)
-		{
-			int result = cmp(current->data, current->next->data);
-			if (result == 1){
-				flag = 1;
-				void *tmp = current->data;
-				current->data = current->next->data;
-				current->next->data = tmp;
-				break;
-			}
-			current = current->next;
-		}
-	}
-}
-
 void	test_ft_list_sort(void)
 {
 	t_list	*shuffled_list = generate_shuffled_list();
@@ -403,6 +387,64 @@ void	test_ft_list_sort(void)
 	ft_list_sort(NULL, NULL);
 }
 
+void	test_ft_list_remove_if(void)
+{
+	t_list *list = generate_linked_list();
+	int			*number = malloc(sizeof(int));
+
+	puts("List generated:");
+	print_list(list);
+	puts("----");
+	*number = 1;
+	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a data ref of" PNK " 1" RESET ":\n");
+	ft_list_remove_if(&list, (void*)number, compare_remove_if, free_content);
+	print_list(list);
+	puts("----");
+
+	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a data ref of" PNK " 0" RESET ":\n");
+	*number = 0;
+	ft_list_remove_if(&list, (void*)number, compare_remove_if, free_content);
+	print_list(list);
+	puts("----");
+
+	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a " RED " NULL ptr" RESET ":\n");
+	ft_list_remove_if(&list, NULL, NULL, NULL);
+	print_list(list);
+
+	free_list(&list);
+	free(number);
+}
+
+// void		ft_list_remove_if_a(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *))
+// {
+// 	t_list *prev = NULL;
+// 	t_list *current = *begin_list;
+
+// 	while (current != NULL)
+// 	{
+// 		if (!cmp(current->data, data_ref))
+// 		{
+// 			if (!prev)
+// 			{
+// 				*begin_list = current->next;
+// 				free_fct(current->data);
+// 				free(current);
+// 				current = *begin_list;
+// 			}
+// 			else
+// 			{
+// 				prev->next = current->next;
+// 				free_fct(current->data);
+// 				free(current);
+// 				current = prev->next;
+// 			}
+// 			continue;
+// 		}
+// 		prev = current;
+// 		current = current->next;
+// 	}
+// }
+/////////////////////////
 
 t_list	*generate_linked_list(void)
 {
@@ -498,4 +540,21 @@ t_list	*generate_shuffled_list(void)
 	node_three->next = node_four;
 	node_four->next = node_five;
 	return node_one;
+}
+
+void	free_content(void *data)
+{
+	free(data);
+}
+
+int	compare_remove_if(void *data, void *data_ref)
+{
+	if (!data || !data_ref)
+		return 1;
+	int data_value = *(int*)data;
+	int	ref_data_value = *(int*)data_ref;
+	if (data_value == ref_data_value)
+		return 0;
+	else
+		return 1;
 }
