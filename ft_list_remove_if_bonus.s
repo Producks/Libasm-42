@@ -1,6 +1,5 @@
 global ft_list_remove_if
 extern free
-extern print_list
 
 		section	.text
 ; rdi taken arg1

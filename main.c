@@ -18,6 +18,7 @@ typedef struct s_list
 } t_list;
 
 //Bonus prototypes
+int 		ft_atoi_base(char *str, char *base);
 void		ft_list_push_front(t_list **begin_list, void *data);
 int			ft_list_size(t_list *begin_list);
 void		ft_list_sort(t_list **begin_list, int (*cmp)());
@@ -34,6 +35,7 @@ void	test_read(void);
 void	test_strdup(void);
 
 //Bonus test functions
+void	test_ft_atoi_base();
 void	test_ft_list_push_front(void);
 void	test_ft_list_size(void);
 void	test_ft_list_sort(void);
@@ -49,6 +51,7 @@ int			compare(void *data, void *data_two);
 int			compare_remove_if(void *data, void *data_ref);
 void		free_content(void *data);
 
+// Print stuff
 void	print_color_meaning(void);
 void	print_settings(void);
 
@@ -62,6 +65,10 @@ void	print_settings(void);
 #define WHT   "\x1B[37m"
 #define PNK   "\x1B[38;5;206m"
 #define RESET "\x1B[0m"
+
+#ifndef BONUS_FLAG
+	#define BONUS_FLAG 0
+#endif
 
 int main(int argc, char **argv)
 {
@@ -88,6 +95,9 @@ int main(int argc, char **argv)
 		case '5':
 			test_strdup();
 			break;
+		case '6':
+			test_ft_atoi_base();
+			break;
 		case '7':
 			test_ft_list_push_front();
 			break;
@@ -98,6 +108,19 @@ int main(int argc, char **argv)
 			test_ft_list_sort();
 			break;
 		case 'a':
+			test_ft_list_remove_if();
+			break;
+		case 'b':
+			test_strlen();
+			test_strcpy();
+			test_strcpm();
+			test_write();
+			test_read();
+			test_strdup();
+			test_ft_atoi_base();
+			test_ft_list_push_front();
+			test_ft_list_size();
+			test_ft_list_sort();
 			test_ft_list_remove_if();
 			break;
 		case 'c':
@@ -235,8 +258,11 @@ void	print_settings(void)
 	"[3] ft_write\n"
 	"[4] ft_read\n"
 	"[5] ft_strdup\n"
-	"[6] atoi_base\n"
-	"[7] ft_list_push_Front\n"
+	"[6] ft_atoi_base\n"
+	"[7] ft_list_push_front\n"
+	"[8] ft_list_size\n"
+	"[9] ft_list_sort\n"
+	"[a] ft_list_remove_if\n"
 	);
 }
 
@@ -252,8 +278,25 @@ void	print_color_meaning(void)
 	BONUS
 */
 
+int 		ft_atoi_base(char *str, char *base)
+{
+	if (!str || !base)
+		return 0;
+	return 1;
+}
+
+
+void	test_ft_atoi_base(void)
+{
+	return;
+}
+
 void	test_ft_list_push_front(void)
 {
+	if (BONUS_FLAG != 1){
+		puts("Compile with the bonus flag");
+		return;
+	}
 	t_list *begining = generate_linked_list();
 
 	if (!begining){
@@ -304,6 +347,10 @@ void	test_ft_list_push_front(void)
 
 void	test_ft_list_size(void)
 {
+	if (BONUS_FLAG != 1){
+		puts("Compile with the bonus flag");
+		return;
+	}
 	t_list *begining = generate_linked_list();
 	if (!begining){
 		puts("FATAL ERROR");
@@ -329,20 +376,12 @@ void	test_ft_list_size(void)
 	free_list(&begining);
 }
 
-int	compare(void *data, void *data_two)
-{
-	if (!data || !data_two)
-		return 0;
-	if (*(int*)data == *(int*)data_two)
-		return 0;
-	if (*(int*)data < *(int*)data_two)
-		return -1;
-	else
-		return 1;
-}
-
 void	test_ft_list_sort(void)
 {
+	if (BONUS_FLAG != 1){
+		puts("Compile with the bonus flag");
+		return;
+	}
 	t_list	*shuffled_list = generate_shuffled_list();
 	if (!shuffled_list){
 		puts("FATAL ERROR");
@@ -389,6 +428,10 @@ void	test_ft_list_sort(void)
 
 void	test_ft_list_remove_if(void)
 {
+	if (BONUS_FLAG != 1){
+		puts("Compile with the bonus flag");
+		return;
+	}
 	t_list *list = generate_linked_list();
 	int			*number = malloc(sizeof(int));
 
@@ -414,37 +457,9 @@ void	test_ft_list_remove_if(void)
 	free_list(&list);
 	free(number);
 }
-
-// void		ft_list_remove_if_a(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *))
-// {
-// 	t_list *prev = NULL;
-// 	t_list *current = *begin_list;
-
-// 	while (current != NULL)
-// 	{
-// 		if (!cmp(current->data, data_ref))
-// 		{
-// 			if (!prev)
-// 			{
-// 				*begin_list = current->next;
-// 				free_fct(current->data);
-// 				free(current);
-// 				current = *begin_list;
-// 			}
-// 			else
-// 			{
-// 				prev->next = current->next;
-// 				free_fct(current->data);
-// 				free(current);
-// 				current = prev->next;
-// 			}
-// 			continue;
-// 		}
-// 		prev = current;
-// 		current = current->next;
-// 	}
-// }
-/////////////////////////
+/*
+ BONUS UTILS
+*/
 
 t_list	*generate_linked_list(void)
 {
@@ -555,6 +570,18 @@ int	compare_remove_if(void *data, void *data_ref)
 	int	ref_data_value = *(int*)data_ref;
 	if (data_value == ref_data_value)
 		return 0;
+	else
+		return 1;
+}
+
+int	compare(void *data, void *data_two)
+{
+	if (!data || !data_two)
+		return 0;
+	if (*(int*)data == *(int*)data_two)
+		return 0;
+	if (*(int*)data < *(int*)data_two)
+		return -1;
 	else
 		return 1;
 }
