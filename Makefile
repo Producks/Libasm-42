@@ -1,5 +1,5 @@
 NAME = libasm.a
-BONUS_NAME = libasm.a
+BONUS_NAME = libasm_bonus.a
 SRCS = 	ft_strlen.s \
 		ft_strcpy.s \
 		ft_strcmp.s \
@@ -20,9 +20,9 @@ $(NAME): $(OBJS)
 	ar rcs $@ $^
 	gcc -Wall -Werror -Wextra main.c libasm.a
 
-dumb: $(OBJS) $(BONUS_OBJS)
-	ar rcs libasm.a $^
-	gcc -D BONUS_FLAG=1 -Wall -Werror -Wextra main.c libasm.a
+$(BONUS_NAME): $(OBJS) $(BONUS_OBJS)
+	ar rcs $@ $^
+	gcc -D BONUS_FLAG=1 -Wall -Werror -Wextra main.c libasm_bonus.a
 
 %.o: %.s
 	nasm -felf64 $<
@@ -33,7 +33,7 @@ clean:
 fclean:clean
 	@rm -f $(NAME) $(BONUS_NAME)
 
-bonus: dumb
+bonus: $(BONUS_NAME)
 
 re:fclean all
 

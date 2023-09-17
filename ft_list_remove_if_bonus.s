@@ -27,8 +27,11 @@ routine:
 		jz		done				; If so, end the loop and leave the function
 compare:
 		call	save_registers		; Save values
+		xor		rdi, rdi
 		mov		rdi, qword [r9]		; Move current->data into arg1
+		push	rdi
 		call	rdx					; Call cmp
+		pop		rdi
 		call	restore_registers	; Restore values
 		test	rax, rax			; Check if it returned 0
 		jnz		move_node			; If the return isn't 0, jump to move_node

@@ -14,7 +14,8 @@
 		"vector": "c",
 		"string_view": "c",
 		"initializer_list": "c",
-		"*.tcc": "c"
+		"*.tcc": "c",
+		"functional": "c"
 	}
   }
   

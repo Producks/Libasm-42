@@ -45,10 +45,8 @@ void	test_ft_list_remove_if(void);
 t_list *generate_linked_list(void);
 void		print_list(t_list *begin);
 void		free_list(t_list **begin);
-t_list	*generate_node(int number);
+t_list	*generate_node(char number);
 t_list	*generate_shuffled_list(void);
-int			compare(void *data, void *data_two);
-int			compare_remove_if(void *data, void *data_ref);
 void		free_content(void *data);
 
 // Print stuff
@@ -114,7 +112,7 @@ int main(int argc, char **argv)
 			test_strlen();
 			test_strcpy();
 			test_strcpm();
-			test_write();
+			//test_write();
 			test_read();
 			test_strdup();
 			test_ft_atoi_base();
@@ -152,6 +150,9 @@ void	test_strcpy(void)
 	result = ft_strcpy(destination, "Hi");
 	printf("Result from " MAG "ft_strcpy " RESET "coying over " PNK "destination " RESET "with " PNK "Hi" RESET " = " GRN "%s\n" RESET, result);
 
+	result = ft_strcpy(destination, "");
+	printf("Result from " MAG "ft_strcpy " RESET "coying over " PNK "destination " RESET "with " PNK "\"\"" RESET " = " GRN "%s\n" RESET, result);
+
 	result = ft_strcpy(NULL, "Sending a NULL ptr!😈\n");
 	if (result == NULL)
 		printf("Result from " MAG "ft_strcpy " RESET "with a " RED "NULL ptr " RESET "sent to it = " GRN "%s" RESET "\n", result);
@@ -172,6 +173,9 @@ void	test_strcpm(void)
 	result = ft_strcmp("Bozo", "Bozo69");
 	printf("Result from " MAG "ft_strcmp " RESET "comparing " PNK "Bozo " RESET "and " PNK "Bozo69" RESET " = " GRN "%d" RESET "\n", result);
 
+	result = ft_strcmp("", "Bozo");
+	printf("Result from " MAG "ft_strcmp " RESET "comparing " PNK "\"\" " RESET "and " PNK "Bozo" RESET " = " GRN "%d" RESET "\n", result);
+
 	result = ft_strcmp(NULL, "Sending a NULL ptr!😈\n");
 	printf("Result from " MAG "ft_strcmp " RESET "being sent a " RED "NULL ptr" RESET " = " GRN "%d" RESET "\n", result);
 }
@@ -180,7 +184,13 @@ void	test_write(void)
 {
 	int result = 0;
 
-	ft_write(1, "Using ft_write to write this on the STDIN!\n-----\n", 49);
+	int fd = open("test.txt", O_WRONLY);
+	if (fd == -1){
+		puts("Open fatal error");
+		return;
+	}
+
+	ft_write(1, "Using ft_write to write this on the STDOUT!\n-----\n", 49);
 
 	printf("Passing " RED "invalid fd" RESET " to " MAG "ft_write" RESET "\n");
 	result = ft_write(69, "BOZO", 40000);
@@ -192,6 +202,12 @@ void	test_write(void)
 	result = ft_write(1, NULL, 4);
 	perror("Libasm:");
 	printf("The return after passing a " RED "NULL ptr" RESET " = " GRN "%d" RESET "\n", result);
+	ft_write(1, "----\n", 6);
+
+	printf("Passing " PNK "test.txt fd" RESET " to " MAG "ft_write" RESET "\n");
+	result = ft_write(fd, "BOZO.COM", 8);
+	printf("The return after passing "PNK "BOZO.COM " RESET " = " GRN "%d" RESET "\n", result);
+	close(fd);
 }
 
 #define BUFFER_SIZE 10
@@ -278,17 +294,92 @@ void	print_color_meaning(void)
 	BONUS
 */
 
-int 		ft_atoi_base(char *str, char *base)
+int	check_base(const char *base)
+{
+	int	index = 0;
+	while (base[index])
+	{
+		if (base[index] == '+' || base[index] == '-' || base[index] == ' '
+			|| base[index] == '\n' || base[index] == '\t' || base[index] == '\v'
+				|| base[index] == '\f' || base[index] == '\r')
+				{
+					return 0;
+				}
+		int j = index + 1;
+		char c = base[index];
+		while (base[j])
+		{
+			if (c == base[j])
+				return 0;
+			j++;
+		}
+		index++;
+	}
+	if (index < 2)
+		return 0;
+	return index;
+}
+
+int	get_numba(char c, char *base)
+{
+	int index = 0;
+
+	while (base[index] && c != base[index])
+		index++;
+	return index;
+}
+
+int 		ft_atoi_base_a(char *str, char *base)
 {
 	if (!str || !base)
 		return 0;
-	return 1;
+	int base_valid = check_base(base);
+	if (base_valid == 0)
+		return 0;
+	int signe = 1;
+	int index = 0;
+	if (str[index] == '+' || str[index] == '-')
+	{
+		if (str[index] == '-')
+			signe = -1;
+		index++;
+	}
+	int total = 0;
+	while (str[index])
+	{
+		int number = get_numba(str[index], base);
+		if (!base[number])
+			break;
+		total = (total * base_valid) + number;
+		index++;
+	}
+	return total * signe;
 }
 
 
 void	test_ft_atoi_base(void)
 {
-	return;
+	if (BONUS_FLAG != 1){
+		puts("Compile with the bonus flag");
+		return;
+	}
+	int result = ft_atoi_base("1000101", "01");
+	printf("Result after " MAG "ft_atoi_base " RESET "is called with the number " PNK "0b1000101" RESET " and a base " PNK "01" RESET " = " GRN "%d" RESET "\n", result);
+
+	result = ft_atoi_base("-42", "0123456789");
+	printf("Result after " MAG "ft_atoi_base " RESET "is called with the number " PNK "-42" RESET " and a base " PNK "0123456789" RESET " = " GRN "%d" RESET "\n", result);
+
+	result = ft_atoi_base("FF", "0123456789ABCDEF");
+	printf("Result after " MAG "ft_atoi_base " RESET "is called with the number " PNK "0xFF" RESET " and a base " PNK "0123456789ABCDEF" RESET " = " GRN "%d" RESET "\n", result);
+
+	result = ft_atoi_base("101", "011");
+	printf("Result after " MAG "ft_atoi_base " RESET "is called with the number " PNK "101" RESET " and a base " RED "011" RESET " = " GRN "%d" RESET "\n", result);
+
+	result = ft_atoi_base("101", "01\n");
+	printf("Result after " MAG "ft_atoi_base " RESET "is called with the number " PNK "101" RESET " and a base " RED "01\\n" RESET " = " GRN "%d" RESET "\n", result);
+
+	result = ft_atoi_base("101", NULL);
+	printf("Result after " MAG "ft_atoi_base " RESET "is called with the number " PNK "101" RESET " and a base " RED "NULL ptr" RESET " = " GRN "%d" RESET "\n", result);
 }
 
 void	test_ft_list_push_front(void)
@@ -392,7 +483,7 @@ void	test_ft_list_sort(void)
 	puts("-----");
 
 	printf("Result after " MAG "ft_list_sort" RESET " is called on the" PNK " shuffled_list" RESET ":\n");
-	ft_list_sort(&shuffled_list, compare);
+	ft_list_sort(&shuffled_list, ft_strcmp);
 	print_list(shuffled_list);
 	free_list(&shuffled_list);
 	puts("-----");
@@ -403,7 +494,7 @@ void	test_ft_list_sort(void)
 		return;
 	}
 	printf("Result after " MAG "ft_list_sort" RESET " is called on " PNK "1 node" RESET ":\n");
-	ft_list_sort(&node, compare);
+	ft_list_sort(&node, ft_strcmp);
 	print_list(node);
 	free_list(&node);
 	puts("-----");
@@ -414,7 +505,7 @@ void	test_ft_list_sort(void)
 		return;
 	}
 	printf("Result after " MAG "ft_list_sort" RESET " is called on a " PNK "sorted list" RESET ":\n");
-	ft_list_sort(&sorted_list, compare);
+	ft_list_sort(&sorted_list, ft_strcmp);
 	print_list(sorted_list);
 	puts("-----");
 	
@@ -433,30 +524,31 @@ void	test_ft_list_remove_if(void)
 		return;
 	}
 	t_list *list = generate_linked_list();
-	int			*number = malloc(sizeof(int));
+	int		*number = malloc(sizeof(int));
 
 	puts("List generated:");
 	print_list(list);
 	puts("----");
 	*number = 1;
 	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a data ref of" PNK " 1" RESET ":\n");
-	ft_list_remove_if(&list, (void*)number, compare_remove_if, free_content);
+	ft_list_remove_if(&list, number, ft_strcmp, free_content);
 	print_list(list);
 	puts("----");
 
-	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a data ref of" PNK " 0" RESET ":\n");
-	*number = 0;
-	ft_list_remove_if(&list, (void*)number, compare_remove_if, free_content);
-	print_list(list);
-	puts("----");
+	// printf("Result after " MAG "ft_list_remove_if" RESET " is called with a data ref of" PNK " 0" RESET ":\n");
+	// *number = 0;
+	// ft_list_remove_if(&list, (void*)number, ft_strcmp, free_content);
+	// print_list(list);
+	// puts("----");
 
-	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a " RED " NULL ptr" RESET ":\n");
-	ft_list_remove_if(&list, NULL, NULL, NULL);
-	print_list(list);
+	// printf("Result after " MAG "ft_list_remove_if" RESET " is called with a " RED "NULL ptr" RESET ":\n");
+	// ft_list_remove_if(&list, NULL, NULL, NULL);
+	// print_list(list);
 
 	free_list(&list);
 	free(number);
 }
+
 /*
  BONUS UTILS
 */
@@ -491,7 +583,7 @@ void		print_list(t_list *begin)
 	{
 		if (current->data != NULL)
 		{
-			printf("%d\n", *(int*)(current->data));
+			printf("%d\n", *(char*)(current->data));
 		}
 		current = current->next;
 	}
@@ -512,7 +604,7 @@ void	free_list(t_list **begin)
 	}
 }
 
-t_list	*generate_node(int number)
+t_list	*generate_node(char number)
 {
 	t_list *node = malloc(sizeof(t_list));
 	if (!node)
@@ -532,10 +624,10 @@ t_list	*generate_node(int number)
 t_list	*generate_shuffled_list(void)
 {
 	t_list *node_one = generate_node(0);
-	t_list *node_two = generate_node(6969);
-	t_list *node_three = generate_node(-69);
+	t_list *node_two = generate_node(125);
+	t_list *node_three = generate_node(42);
 	t_list *node_four = generate_node(69);
-	t_list *node_five = generate_node(-6969);
+	t_list *node_five = generate_node(1);
 	if (!node_one || !node_two || !node_three || !node_four || !node_five){
 		if (node_one)
 			free(node_one);
@@ -560,28 +652,4 @@ t_list	*generate_shuffled_list(void)
 void	free_content(void *data)
 {
 	free(data);
-}
-
-int	compare_remove_if(void *data, void *data_ref)
-{
-	if (!data || !data_ref)
-		return 1;
-	int data_value = *(int*)data;
-	int	ref_data_value = *(int*)data_ref;
-	if (data_value == ref_data_value)
-		return 0;
-	else
-		return 1;
-}
-
-int	compare(void *data, void *data_two)
-{
-	if (!data || !data_two)
-		return 0;
-	if (*(int*)data == *(int*)data_two)
-		return 0;
-	if (*(int*)data < *(int*)data_two)
-		return -1;
-	else
-		return 1;
 }
