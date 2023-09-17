@@ -23,8 +23,6 @@ void		ft_list_push_front(t_list **begin_list, void *data);
 int			ft_list_size(t_list *begin_list);
 void		ft_list_sort(t_list **begin_list, int (*cmp)());
 t_list	*ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *));
-// (*cmp)(list_ptr->data, data_ref);
-// (*free_fct)(list_ptr->data);
 
 //Prototypes for test functions
 void	test_strlen(void);
@@ -190,7 +188,7 @@ void	test_write(void)
 		return;
 	}
 
-	ft_write(1, "Using ft_write to write this on the STDOUT!\n-----\n", 49);
+	ft_write(1, "Using ft_write to write this on the STDOUT!\n-----\n", 50);
 
 	printf("Passing " RED "invalid fd" RESET " to " MAG "ft_write" RESET "\n");
 	result = ft_write(69, "BOZO", 40000);
@@ -267,7 +265,6 @@ void	test_strdup(void)
 void	print_settings(void)
 {
 	printf("To access the correct test function, pass the correct parameter\n"
-	"[c] Print color meaning\n"
 	"[0] ft_strlen\n"
 	"[1] ft_strcpy\n"
 	"[2] ft_strcmp\n"
@@ -279,6 +276,7 @@ void	print_settings(void)
 	"[8] ft_list_size\n"
 	"[9] ft_list_sort\n"
 	"[a] ft_list_remove_if\n"
+	"[c] Print color meaning\n"
 	);
 }
 
@@ -293,69 +291,6 @@ void	print_color_meaning(void)
 /*
 	BONUS
 */
-
-int	check_base(const char *base)
-{
-	int	index = 0;
-	while (base[index])
-	{
-		if (base[index] == '+' || base[index] == '-' || base[index] == ' '
-			|| base[index] == '\n' || base[index] == '\t' || base[index] == '\v'
-				|| base[index] == '\f' || base[index] == '\r')
-				{
-					return 0;
-				}
-		int j = index + 1;
-		char c = base[index];
-		while (base[j])
-		{
-			if (c == base[j])
-				return 0;
-			j++;
-		}
-		index++;
-	}
-	if (index < 2)
-		return 0;
-	return index;
-}
-
-int	get_numba(char c, char *base)
-{
-	int index = 0;
-
-	while (base[index] && c != base[index])
-		index++;
-	return index;
-}
-
-int 		ft_atoi_base_a(char *str, char *base)
-{
-	if (!str || !base)
-		return 0;
-	int base_valid = check_base(base);
-	if (base_valid == 0)
-		return 0;
-	int signe = 1;
-	int index = 0;
-	if (str[index] == '+' || str[index] == '-')
-	{
-		if (str[index] == '-')
-			signe = -1;
-		index++;
-	}
-	int total = 0;
-	while (str[index])
-	{
-		int number = get_numba(str[index], base);
-		if (!base[number])
-			break;
-		total = (total * base_valid) + number;
-		index++;
-	}
-	return total * signe;
-}
-
 
 void	test_ft_atoi_base(void)
 {
@@ -535,15 +470,15 @@ void	test_ft_list_remove_if(void)
 	print_list(list);
 	puts("----");
 
-	// printf("Result after " MAG "ft_list_remove_if" RESET " is called with a data ref of" PNK " 0" RESET ":\n");
-	// *number = 0;
-	// ft_list_remove_if(&list, (void*)number, ft_strcmp, free_content);
-	// print_list(list);
-	// puts("----");
+	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a data ref of" PNK " 0" RESET ":\n");
+	*number = 0;
+	ft_list_remove_if(&list, (void*)number, ft_strcmp, free_content);
+	print_list(list);
+	puts("----");
 
-	// printf("Result after " MAG "ft_list_remove_if" RESET " is called with a " RED "NULL ptr" RESET ":\n");
-	// ft_list_remove_if(&list, NULL, NULL, NULL);
-	// print_list(list);
+	printf("Result after " MAG "ft_list_remove_if" RESET " is called with a " RED "NULL ptr" RESET ":\n");
+	ft_list_remove_if(&list, NULL, NULL, NULL);
+	print_list(list);
 
 	free_list(&list);
 	free(number);
